@@ -13,13 +13,20 @@ class CategoryDetailsScreen extends StatelessWidget {
 
   String _getCategoryImage() {
     switch (categoryName.toLowerCase()) {
-      case 'pizza': return 'assets/pizza.jpg';
-      case 'indian': return 'assets/burger.jpg';
-      case 'burger': return 'assets/burger.jpg';
-      case 'kottu': return 'assets/pizza.jpg';
-      case 'soup': return 'assets/coke.jpg';
-      case 'juice': return 'assets/coke.jpg';
-      default: return 'assets/burger.jpg';
+      case 'pizza':
+        return 'assets/pizza.jpeg';
+      case 'indian':
+        return 'assets/indian.jpeg';
+      case 'burger':
+        return 'assets/burger.jpeg';
+      case 'kottu':
+        return 'assets/koththu.jpeg';
+      case 'soup':
+        return 'assets/soup.jpeg';
+      case 'juice':
+        return 'assets/juice.jpeg';
+      default:
+        return 'assets/burger.jpeg'; // Default fallback
     }
   }
 

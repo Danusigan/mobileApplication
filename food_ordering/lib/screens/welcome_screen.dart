@@ -12,39 +12,49 @@ class WelcomeScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Logo and Title
+          // Logo and Title at the top - Horizontal version
           Padding(
             padding: const EdgeInsets.only(top: 60.0, left: 30, right: 30),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset('assets/logo.png', width: 40, height: 40),
+                // Logo
+                Image.asset(
+                  'assets/logo.jpeg',
+                  width: 40,
+                  height: 40,
+                ),
                 const SizedBox(width: 12),
+                // Title
                 Text(
                   "Order Eats",
                   style: GoogleFonts.poppins(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF321587),
+                    color: const Color(0xFF321587), // Matching button color
                   ),
                 ),
               ],
             ),
           ),
 
-          // Main Image (FIXED: Changed 'bur.jpg' to 'burger.jpg')
+          // Add padding before the image using Padding widget
+          const Padding(
+            padding: EdgeInsets.only(top: 0.0), // Reduced from 60 to 20
+          ),
+
           Expanded(
             child: Center(
               child: Container(
-                margin: const EdgeInsets.only(top: 10.0),
-                child: Image.asset(
-                  'assets/burger.jpg', // <--- THIS WAS THE ERROR
-                  width: double.infinity,
-                  height: 500,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.broken_image, size: 100, color: Colors.grey);
-                  },
+                margin: const EdgeInsets.only(top: 10.0), // Add top padding
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(0.0), // Add border radius
+                  child: Image.asset(
+                    'assets/bur.jpg',
+                    width: double.infinity,
+                    height: 500,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),

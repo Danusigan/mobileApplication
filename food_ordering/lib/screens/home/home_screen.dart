@@ -18,12 +18,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // Ensure these match your renamed files (lowercase .jpg)
   final List<Map<String, String>> categories = [
-    {'name': 'Pizza', 'img': 'assets/pizza.jpg'},
-    {'name': 'Indian', 'img': 'assets/indian.jpg'},
-    {'name': 'Burger', 'img': 'assets/burger.jpg'},
-    {'name': 'Kottu', 'img': 'assets/koththu.jpg'},
-    {'name': 'Soup', 'img': 'assets/soup.jpg'},
-    {'name': 'Juice', 'img': 'assets/juice.jpg'},
+    {'name': 'Pizza', 'img': 'assets/pizza2.jpeg'},
+    {'name': 'Indian', 'img': 'assets/indian.jpeg'}, // Use appropriate assets
+    {'name': 'Burger', 'img': 'assets/burger2.jpeg'},
+    {'name': 'Kottu', 'img': 'assets/koththu.jpeg'},
+    {'name': 'Soup', 'img': 'assets/soup.jpeg'},
+    {'name': 'Juice', 'img': 'assets/juice.jpeg'},
   ];
 
   @override
@@ -53,12 +53,12 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(color: Colors.grey[300]),
+              decoration: BoxDecoration(color: Colors.black),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Hi ${widget.userName},", style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500)),
-                  Text("Good morning!", style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text("Hi ${widget.userName},", style: GoogleFonts.poppins(fontSize: 16,color: Colors.white, fontWeight: FontWeight.w500)),
+                  Text("Good morning!", style: GoogleFonts.poppins(fontSize: 16,color: Colors.white, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
