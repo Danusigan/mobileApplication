@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'auth/login_screen.dart';
-import 'auth/signup_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'auth/signup_screen.dart'; // <--- IMPORT THIS
+import 'auth/login_screen.dart';  // <--- IMPORT THIS
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -8,54 +9,59 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("Welcome to the page", style: TextStyle(fontSize: 20, color: Colors.grey)),
-            const SizedBox(height: 20),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
-              Icon(Icons.shopping_cart, color: Colors.brown),
-              SizedBox(width: 10),
-              Text("Order Eats", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            ]),
-            const SizedBox(height: 30),
-            // Placeholder for your big burger image
-            Container(
-              height: 300,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                image: const DecorationImage(
-                  image: AssetImage('assets/burger_cover.png'), // Add your image to assets
-                  fit: BoxFit.cover,
+      backgroundColor: Colors.white,
+      body: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: Image.asset('assets/logo.png', width: 200), // Make sure you have a logo
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Column(
+              children: [
+                Text(
+                  "Order Your Food Now!",
+                  style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
-              ),
+                const SizedBox(height: 10),
+                Text(
+                  "Order food and get delivery within a few minutes to your door",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey),
+                ),
+                const SizedBox(height: 40),
+
+                // SIGN UP BUTTON
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // FIX IS HERE: Use SignUpScreen() with capital U
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SignUpScreen()));
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF321587),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text("Get Started", style: TextStyle(color: Colors.white, fontSize: 18)),
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                // LOGIN BUTTON
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+                  },
+                  child: const Text("Already have an account? Login", style: TextStyle(color: Colors.grey)),
+                ),
+              ],
             ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF321587)),
-                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())),
-                child: const Text("Login", style: TextStyle(color: Colors.white)),
-              ),
-            ),
-            const SizedBox(height: 15),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF321587)),
-                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SignupScreen())),
-                child: const Text("Signup", style: TextStyle(color: Colors.white)),
-              ),
-            ),
-            const SizedBox(height: 40),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

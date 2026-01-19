@@ -5,7 +5,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.9.0
+  sdk: ^3.0.0  # (I adjusted this slightly to be safe, usually ^3.0.0 is better than 3.9.0 if you don't have that specific version yet)
 
 dependencies:
   flutter:
@@ -14,11 +14,14 @@ dependencies:
   # Icons
   cupertino_icons: ^1.0.8
 
-  # State Management (for the Cart/Bucket)
+  # State Management
   provider: ^6.1.1
 
-  # Modern Fonts
+  # Fonts & Firebase (NOTICE THE SPACES BEFORE THESE LINES)
   google_fonts: ^6.1.0
+  firebase_core: ^2.27.0
+  firebase_auth: ^4.17.8
+  cloud_firestore: ^4.15.8
 
 dev_dependencies:
   flutter_test:
@@ -28,8 +31,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # This section tells Flutter where your images are.
-  # Ensure your folder is named "assets" (not "asserts")
-  # and is located at the root of your project.
   assets:
     - assets/

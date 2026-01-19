@@ -1,87 +1,113 @@
 import 'package:flutter/material.dart';
-import 'welcome_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'auth/login_screen.dart';
+import 'orders_screen.dart'; // We will create this small file next
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  final Map<String, dynamic> userData;
+
+  const ProfileScreen({super.key, required this.userData});
 
   @override
   Widget build(BuildContext context) {
+    final bool isUser = userData['role'] == 'user';
+
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              const Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.shopping_cart, color: Colors.brown),
-                    SizedBox(width: 10),
-                    Text("Order Eats", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  ],
-                ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("My Profile"),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.red),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              if (context.mounted) {
+                // Clear stack and go back to login
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      (Route<dynamic> route) => false,
+                );
+              }
+            },
+          )
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            // PROFILE IMAGE (Placeholder)
+            const CircleAvatar(
+              radius: 50,
+              backgroundColor: Color(0xFF321587),
+              child: Icon(Icons.person, size: 50, color: Colors.white),
+            ),
+            const SizedBox(height: 20),
+
+            // USER INFO CARD
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(15),
               ),
-              const SizedBox(height: 30),
-
-              // User Info Card
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.account_circle, size: 60, color: Colors.black87),
-                    const SizedBox(width: 15),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text("Sanjilraj A.", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        Text("User ID : 005", style: TextStyle(color: Colors.black)),
-                      ],
-                    )
-                  ],
-                ),
+              child: Column(
+                children: [
+                  _buildInfoRow(Icons.person, "Name", userData['name']),
+                  const Divider(),
+                  _buildInfoRow(Icons.email, "Email", FirebaseAuth.instance.currentUser?.email ?? "No Email"),
+                  const Divider(),
+                  _buildInfoRow(Icons.badge, "User ID", userData['uid']),
+                  const Divider(),
+                  _buildInfoRow(Icons.security, "Role", userData['role'].toString().toUpperCase()),
+                ],
               ),
-              const SizedBox(height: 30),
+            ),
+            const SizedBox(height: 30),
 
-              // Menu Items
-              const Divider(color: Colors.black54),
-              const ListTile(title: Text("Promotions")),
-              const Divider(color: Colors.black54),
-              const ListTile(title: Text("Buckets")),
-              const Divider(color: Colors.black54),
-              const ListTile(title: Text("Current Orders")),
-              const Divider(color: Colors.black54),
-
-              const Spacer(),
-
-              // Logout Button
-              Center(
-                child: SizedBox(
-                  width: 200,
-                  height: 45,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFD32F2F), // Red color
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25))
-                    ),
-                    onPressed: () {
-                      // Go back to Welcome/Login
-                      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const WelcomeScreen()), (route) => false);
-                    },
-                    child: const Text("Logout", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            // "CURRENT ORDERS" BUTTON (Only for Users)
+            if (isUser)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const OrdersScreen()));
+                  },
+                  icon: const Icon(Icons.receipt_long),
+                  label: const Text("View My Orders"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF321587),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.all(15),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-            ],
-          ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.grey),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                Text(value, style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

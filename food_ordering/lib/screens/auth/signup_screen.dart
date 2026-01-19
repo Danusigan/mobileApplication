@@ -1,97 +1,129 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
-import '../wrapper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'login_screen.dart'; // Imports Login from the same folder
 
-class SignupScreen extends StatelessWidget {
-  const SignupScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  Future<void> signUp() async {
+    // 1. Check Passwords Match
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Passwords do not match!")),
+      );
+      return;
+    }
+
+    try {
+      // 2. Create User in Firebase Auth
+      UserCredential userCredential =
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      // 3. Save User Data to Firestore
+      await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({
+        'uid': userCredential.user!.uid,
+        'name': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'role': 'user', // Default role. Change to 'admin' in Firebase Console manually.
+        'createdAt': DateTime.now(),
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Account Created Successfully!")),
+        );
+        // Go to Login Page
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen())
+        );
+      }
+
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? "Sign Up Failed")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
+      backgroundColor: Colors.white,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text("Signup", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.grey)),
-              const SizedBox(height: 40),
-
-              // Logo
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.shopping_cart, color: Colors.brown),
-                  SizedBox(width: 10),
-                  Text("Order Eats", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                ],
+              const Text("Create Account", style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 30),
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.person),
+                  labelText: "Full Name",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+              const SizedBox(height: 15),
+              TextField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.email),
+                  labelText: "Email",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+              const SizedBox(height: 15),
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.lock),
+                  labelText: "Password",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+              const SizedBox(height: 15),
+              TextField(
+                controller: _confirmPasswordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  labelText: "Confirm Password",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
               ),
               const SizedBox(height: 30),
-
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade300)
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: signUp,
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF321587)),
+                  child: const Text("SIGN UP", style: TextStyle(color: Colors.white, fontSize: 18)),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Toggle Buttons
-                    Row(children: [
-                      Expanded(
-                          child: TextButton(
-                              onPressed: (){
-                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
-                              },
-                              style: TextButton.styleFrom(backgroundColor: Colors.white),
-                              child: const Text("Login", style: TextStyle(color: Colors.black))
-                          )
-                      ),
-                      Expanded(
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF321587)),
-                              onPressed: (){},
-                              child: const Text("Signup", style: TextStyle(color: Colors.white))
-                          )
-                      ),
-                    ]),
-                    const SizedBox(height: 20),
-
-                    // Fields
-                    const Text("User Name :"),
-                    const SizedBox(height: 8),
-                    TextField(decoration: InputDecoration(filled: true, fillColor: Colors.grey[300], border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none))),
-
-                    const SizedBox(height: 15),
-                    const Text("Password :"),
-                    const SizedBox(height: 8),
-                    TextField(obscureText: true, decoration: InputDecoration(filled: true, fillColor: Colors.grey[300], border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none))),
-
-                    const SizedBox(height: 15),
-                    const Text("Confirm Password :"),
-                    const SizedBox(height: 8),
-                    TextField(obscureText: true, decoration: InputDecoration(filled: true, fillColor: Colors.grey[300], border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none))),
-
-                    const SizedBox(height: 30),
-
-                    // Signup Button
-                    Center(
-                      child: SizedBox(
-                        width: 150,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF321587)),
-                          onPressed: () {
-                            // Navigate to Home
-                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const MainWrapper()), (route) => false);
-                          },
-                          child: const Text("Signup", style: TextStyle(color: Colors.white)),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              ),
+              TextButton(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+                  },
+                  child: const Text("Already have an account? Login")
               )
             ],
           ),
