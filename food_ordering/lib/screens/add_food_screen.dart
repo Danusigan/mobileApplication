@@ -9,42 +9,28 @@ class AddFoodScreen extends StatefulWidget {
 }
 
 class _AddFoodScreenState extends State<AddFoodScreen> {
-  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _priceController = TextEditingController();
+  final _countController = TextEditingController(); // NEW: Quantity Controller
 
-  // Controllers to capture user text
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController priceController = TextEditingController();
+  String _selectedCategory = 'Pizza';
+  final List<String> _categories = ['Pizza', 'Indian', 'Burger', 'Kottu', 'Soup', 'Juice'];
 
-  // Default values
-  String selectedCategory = 'Pizza';
-  String selectedImage = 'assets/pizza.jpg';
+  Future<void> addFood() async {
+    if (_nameController.text.isEmpty || _priceController.text.isEmpty || _countController.text.isEmpty) return;
 
-  // List of categories matching your Home Screen
-  final List<String> categories = ['Pizza', 'Burger', 'Drinks', 'Chicken'];
+    await FirebaseFirestore.instance.collection('foods').add({
+      'name': _nameController.text,
+      'price': int.parse(_priceController.text),
+      'count': int.parse(_countController.text), // NEW: Save Count
+      'category': _selectedCategory,
+      'imagePath': 'assets/pizza.jpg', // Default image (you can improve this later)
+      'createdAt': DateTime.now(),
+    });
 
-  Future<void> saveFood() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        await FirebaseFirestore.instance.collection('foods').add({
-          'name': nameController.text,
-          'price': double.parse(priceController.text),
-          'category': selectedCategory,
-          'imagePath': selectedImage,
-          // Note: Real apps upload images, but for now we use your asset files
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Food Added Successfully!')),
-        );
-
-        // Clear the form
-        nameController.clear();
-        priceController.clear();
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Food Added Successfully!")));
+      Navigator.pop(context);
     }
   }
 
@@ -54,52 +40,43 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       appBar: AppBar(title: const Text("Add New Item")),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              // 1. Name Input
-              TextFormField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Food Name'),
-                validator: (value) => value!.isEmpty ? 'Enter a name' : null,
+        child: Column(
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(labelText: "Food Name", border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: _priceController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: "Price (LKR)", border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 15),
+            // NEW: Quantity Input
+            TextField(
+              controller: _countController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: "Quantity Available", border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 15),
+            DropdownButtonFormField(
+              value: _selectedCategory,
+              items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+              onChanged: (val) => setState(() => _selectedCategory = val!),
+              decoration: const InputDecoration(labelText: "Category", border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 30),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: addFood,
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF321587)),
+                child: const Text("ADD TO MENU", style: TextStyle(color: Colors.white)),
               ),
-
-              // 2. Price Input
-              TextFormField(
-                controller: priceController,
-                decoration: const InputDecoration(labelText: 'Price (LKR)'),
-                keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Enter a price' : null,
-              ),
-              const SizedBox(height: 20),
-
-              // 3. Category Dropdown
-              DropdownButtonFormField<String>(
-                value: selectedCategory,
-                decoration: const InputDecoration(labelText: 'Category'),
-                items: categories.map((cat) {
-                  return DropdownMenuItem(value: cat, child: Text(cat));
-                }).toList(),
-                onChanged: (val) => setState(() => selectedCategory = val!),
-              ),
-              const SizedBox(height: 20),
-
-              // 4. Save Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: saveFood,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                  ),
-                  child: const Text("SAVE TO DATABASE"),
-                ),
-              ),
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );

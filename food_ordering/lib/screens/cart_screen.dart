@@ -18,83 +18,59 @@ class CartScreen extends StatelessWidget {
           ? const Center(child: Text("Your cart is empty!"))
           : Column(
         children: [
-          // LIST OF ITEMS
           Expanded(
             child: ListView.builder(
               itemCount: cartItems.length,
               itemBuilder: (ctx, i) => ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Colors.purple.shade100,
-                  child: Text("x${cartItems[i].quantity}"),
-                ),
                 title: Text(cartItems[i].name),
-                subtitle: Text("LKR ${cartItems[i].price * cartItems[i].quantity}"),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    cart.removeItem(cartItems[i].id);
-                  },
-                ),
+                subtitle: Text("Qty: ${cartItems[i].quantity} x LKR ${cartItems[i].price}"),
+                trailing: Text("LKR ${cartItems[i].price * cartItems[i].quantity}"),
               ),
             ),
           ),
-
-          // TOTAL & ORDER BUTTON
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -5))],
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text("Total:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    Text("LKR ${cart.totalAmount}", style: const TextStyle(fontSize: 20, color: Colors.green, fontWeight: FontWeight.bold)),
-                  ],
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  if (cart.totalAmount <= 0) return;
+
+                  final user = FirebaseAuth.instance.currentUser;
+
+                  // 1. SAVE ORDER
+                  await FirebaseFirestore.instance.collection('orders').add({
+                    'userId': user?.uid,
+                    'amount': cart.totalAmount,
+                    'items': cartItems.map((item) => {
+                      'id': item.id,
+                      'name': item.name,
+                      'quantity': item.quantity,
+                    }).toList(),
+                    'date': DateTime.now().toIso8601String(),
+                    'status': 'Pending'
+                  });
+
+                  // 2. DECREASE STOCK (Crucial Step)
+                  for (var item in cartItems) {
+                    // Find the food in DB and decrease count
+                    await FirebaseFirestore.instance.collection('foods').doc(item.id).update({
+                      'count': FieldValue.increment(-item.quantity)
+                    });
+                  }
+
+                  cart.clearCart();
+
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Order Confirmed!")));
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF321587),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (cart.totalAmount <= 0) return;
-
-                      final user = FirebaseAuth.instance.currentUser;
-
-                      // SAVE ORDER TO FIREBASE
-                      await FirebaseFirestore.instance.collection('orders').add({
-                        'userId': user?.uid,
-                        'userEmail': user?.email,
-                        'amount': cart.totalAmount,
-                        'items': cartItems.map((item) => {
-                          'id': item.id,
-                          'name': item.name,
-                          'quantity': item.quantity,
-                          'price': item.price,
-                        }).toList(),
-                        'status': 'Pending', // Order status
-                        'date': DateTime.now().toIso8601String(),
-                      });
-
-                      cart.clearCart();
-
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Order Placed Successfully!")),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF321587),
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                    ),
-                    child: const Text("CONFIRM ORDER", style: TextStyle(color: Colors.white, fontSize: 18)),
-                  ),
-                ),
-              ],
+                child: Text("CONFIRM ORDER (LKR ${cart.totalAmount})", style: const TextStyle(color: Colors.white)),
+              ),
             ),
           )
         ],

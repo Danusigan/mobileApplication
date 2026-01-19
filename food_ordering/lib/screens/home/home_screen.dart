@@ -5,25 +5,23 @@ import 'category_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userRole;
-  final String userName; // <--- ADD THIS
+  final String userName;
 
-  // Update constructor to require userName
-  const HomeScreen({
-    super.key,
-    this.userRole = 'user',
-    required this.userName // <--- ADD THIS
-  });
+  const HomeScreen({super.key, this.userRole = 'user', required this.userName});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // Exact categories from your image
   final List<Map<String, String>> categories = [
     {'name': 'Pizza', 'img': 'assets/pizza.jpg'},
+    {'name': 'Indian', 'img': 'assets/burger.jpg'}, // Use appropriate assets
     {'name': 'Burger', 'img': 'assets/burger.jpg'},
-    {'name': 'Drinks', 'img': 'assets/coke.jpg'},
-    {'name': 'Chicken', 'img': 'assets/pizza.jpg'},
+    {'name': 'Kottu', 'img': 'assets/pizza.jpg'},
+    {'name': 'Soup', 'img': 'assets/coke.jpg'},
+    {'name': 'Juice', 'img': 'assets/coke.jpg'},
   ];
 
   @override
@@ -33,107 +31,95 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: const Icon(Icons.menu, color: Colors.black),
+        // Hide default back button, use custom menu icon if needed
+        automaticallyImplyLeading: false,
         title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // SHOW USER NAME HERE
-            Text("Hi, ${widget.userName}!", style: GoogleFonts.poppins(fontSize: 14, color: Colors.black)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.location_on, color: Color(0xFF321587), size: 14),
-                Text("Vavuniya, SL", style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
-              ],
-            )
+            Text("Home page", style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14)),
           ],
         ),
         actions: [
           if (widget.userRole == 'admin')
             IconButton(
-              icon: const Icon(Icons.admin_panel_settings, color: Colors.deepPurple),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const AddFoodScreen()));
-              },
+              icon: const Icon(Icons.add_circle, color: Color(0xFF321587), size: 30),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddFoodScreen())),
             ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 15),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Search Bar
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(15)),
-                child: const TextField(
-                  decoration: InputDecoration(
-                    border: InputBorder.none, prefixIcon: Icon(Icons.search, color: Colors.grey), hintText: "Search food...",
-                  ),
-                ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            // 1. GREY BANNER "Hi Name"
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.grey[300], // Light grey background like image
+                borderRadius: BorderRadius.circular(0), // Sharp edges as per image
               ),
-              const SizedBox(height: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Hi ${widget.userName},", style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500)),
+                  Text("Good morning!", style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
 
-              // Categories
-              Text("Categories", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 15),
-              SizedBox(
-                height: 120,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categories.length,
-                  separatorBuilder: (context, index) => const SizedBox(width: 15),
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => CategoryDetailsScreen(categoryName: categories[index]['name']!)));
-                      },
-                      child: Container(
-                        width: 100,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade200),
-                          borderRadius: BorderRadius.circular(15),
-                          color: Colors.white,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(height: 60, width: 60, child: Image.asset(categories[index]['img']!, fit: BoxFit.contain)),
-                            const SizedBox(height: 10),
-                            Text(categories[index]['name']!, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          ],
-                        ),
+            // 2. "Menu" Title
+            Text("Menu", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 15),
+
+            // 3. GRID VIEW (2 Columns)
+            Expanded(
+              child: GridView.builder(
+                itemCount: categories.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // Two items per row
+                  crossAxisSpacing: 15,
+                  mainAxisSpacing: 15,
+                  childAspectRatio: 0.8, // Taller items
+                ),
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(
+                          builder: (_) => CategoryDetailsScreen(categoryName: categories[index]['name']!)
+                      ));
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey.shade400),
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Banner
-              Container(
-                width: double.infinity, height: 150,
-                decoration: BoxDecoration(color: const Color(0xFF321587), borderRadius: BorderRadius.circular(20)),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(20.0),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text("Get 30% OFF", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                          Text("On your first order", style: TextStyle(color: Colors.white70)),
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.asset(categories[index]['img']!, fit: BoxFit.cover),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(categories[index]['name']!, style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
+                          ),
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
