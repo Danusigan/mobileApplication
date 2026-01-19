@@ -9,6 +9,26 @@ class CategoryDetailsScreen extends StatelessWidget {
 
   const CategoryDetailsScreen({super.key, required this.categoryName});
 
+  // Helper method to get the appropriate image for each category
+  String _getCategoryImage() {
+    switch (categoryName.toLowerCase()) {
+      case 'pizza':
+        return 'assets/pizza.jpeg';
+      case 'indian':
+        return 'assets/indian.jpeg';
+      case 'burger':
+        return 'assets/burger.jpeg';
+      case 'kottu':
+        return 'assets/koththu.jpeg';
+      case 'soup':
+        return 'assets/soup.jpeg';
+      case 'juice':
+        return 'assets/juice.jpeg';
+      default:
+        return 'assets/burger.jpeg'; // Default fallback
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,13 +36,16 @@ class CategoryDetailsScreen extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. TOP BIG IMAGE (Matches your Figma)
+          // 1. TOP BIG IMAGE (Dynamic based on category)
           Stack(
             children: [
               SizedBox(
                 height: 250,
                 width: double.infinity,
-                child: Image.asset('assets/burger.jpg', fit: BoxFit.cover), // Generic Category Image
+                child: Image.asset(
+                  _getCategoryImage(),
+                  fit: BoxFit.cover,
+                ),
               ),
               Positioned(
                 top: 40,
@@ -35,7 +58,14 @@ class CategoryDetailsScreen extends StatelessWidget {
               Positioned(
                 top: 50,
                 left: 60,
-                child: Text(categoryName, style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.grey[300])),
+                child: Text(
+                  categoryName,
+                  style: GoogleFonts.poppins(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[300]
+                  ),
+                ),
               )
             ],
           ),
@@ -44,7 +74,13 @@ class CategoryDetailsScreen extends StatelessWidget {
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Text(categoryName, style: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold)),
+            child: Text(
+              categoryName,
+              style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold
+              ),
+            ),
           ),
 
           const SizedBox(height: 10),
@@ -86,11 +122,29 @@ class CategoryDetailsScreen extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(data['name'], style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500)),
+                              Text(
+                                data['name'],
+                                style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500
+                                ),
+                              ),
                               const SizedBox(height: 5),
-                              Text("LKR ${data['price']}.00", style: GoogleFonts.poppins(fontSize: 14, color: Colors.black)),
+                              Text(
+                                "LKR ${data['price']}.00",
+                                style: GoogleFonts.poppins(
+                                    fontSize: 14,
+                                    color: Colors.black
+                                ),
+                              ),
                               if (!isAvailable)
-                                Text("Out of Stock", style: TextStyle(color: Colors.red, fontSize: 12)),
+                                Text(
+                                  "Out of Stock",
+                                  style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 12
+                                  ),
+                                ),
                             ],
                           ),
 
@@ -103,7 +157,10 @@ class CategoryDetailsScreen extends StatelessWidget {
                                   data['price']
                               );
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text("${data['name']} added to cart!"), duration: const Duration(seconds: 1))
+                                  SnackBar(
+                                      content: Text("${data['name']} added to cart!"),
+                                      duration: const Duration(seconds: 1)
+                                  )
                               );
                             } : null, // Disable button if stock is 0
                             icon: Icon(

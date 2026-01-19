@@ -16,12 +16,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // Exact categories from your image
   final List<Map<String, String>> categories = [
-    {'name': 'Pizza', 'img': 'assets/pizza.jpg'},
-    {'name': 'Indian', 'img': 'assets/burger.jpg'}, // Use appropriate assets
-    {'name': 'Burger', 'img': 'assets/burger.jpg'},
-    {'name': 'Kottu', 'img': 'assets/pizza.jpg'},
-    {'name': 'Soup', 'img': 'assets/coke.jpg'},
-    {'name': 'Juice', 'img': 'assets/coke.jpg'},
+    {'name': 'Pizza', 'img': 'assets/pizza2.jpeg'},
+    {'name': 'Indian', 'img': 'assets/indian.jpeg'}, // Use appropriate assets
+    {'name': 'Burger', 'img': 'assets/burger2.jpeg'},
+    {'name': 'Kottu', 'img': 'assets/koththu.jpeg'},
+    {'name': 'Soup', 'img': 'assets/soup.jpeg'},
+    {'name': 'Juice', 'img': 'assets/juice.jpeg'},
   ];
 
   @override
@@ -35,9 +35,9 @@ class _HomeScreenState extends State<HomeScreen> {
         automaticallyImplyLeading: false,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Home page", style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14)),
-          ],
+          // children: [
+          //   //Text("Home page", style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14)),
+          // ],
         ),
         actions: [
           if (widget.userRole == 'admin')
@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // 1. GREY BANNER "Hi Name"
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: Colors.grey[300], // Light grey background like image
                 borderRadius: BorderRadius.circular(0), // Sharp edges as per image

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'auth/signup_screen.dart'; // <--- IMPORT THIS
-import 'auth/login_screen.dart';  // <--- IMPORT THIS
+import 'auth/signup_screen.dart';
+import 'auth/login_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -12,11 +12,54 @@ class WelcomeScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          Expanded(
-            child: Center(
-              child: Image.asset('assets/logo.png', width: 200), // Make sure you have a logo
+          // Logo and Title at the top - Horizontal version
+          Padding(
+            padding: const EdgeInsets.only(top: 60.0, left: 30, right: 30),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Logo
+                Image.asset(
+                  'assets/logo.jpeg',
+                  width: 40,
+                  height: 40,
+                ),
+                const SizedBox(width: 12),
+                // Title
+                Text(
+                  "Order Eats",
+                  style: GoogleFonts.poppins(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF321587), // Matching button color
+                  ),
+                ),
+              ],
             ),
           ),
+
+          // Add padding before the image using Padding widget
+          const Padding(
+            padding: EdgeInsets.only(top: 0.0), // Reduced from 60 to 20
+          ),
+
+          Expanded(
+            child: Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 10.0), // Add top padding
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(0.0), // Add border radius
+                  child: Image.asset(
+                    'assets/bur.jpg',
+                    width: double.infinity,
+                    height: 500,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           Padding(
             padding: const EdgeInsets.all(30.0),
             child: Column(
@@ -39,7 +82,6 @@ class WelcomeScreen extends StatelessWidget {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      // FIX IS HERE: Use SignUpScreen() with capital U
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const SignUpScreen()));
                     },
                     style: ElevatedButton.styleFrom(
