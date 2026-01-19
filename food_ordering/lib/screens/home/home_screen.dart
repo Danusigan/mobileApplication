@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+// --- FIXED IMPORT (Use only one "../") ---
 import '../add_food_screen.dart';
 import 'category_details_screen.dart';
 
@@ -14,14 +16,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Exact categories from your image
+  // Ensure these match your renamed files (lowercase .jpg)
   final List<Map<String, String>> categories = [
-    {'name': 'Pizza', 'img': 'assets/pizza2.jpeg'},
-    {'name': 'Indian', 'img': 'assets/indian.jpeg'}, // Use appropriate assets
-    {'name': 'Burger', 'img': 'assets/burger2.jpeg'},
-    {'name': 'Kottu', 'img': 'assets/koththu.jpeg'},
-    {'name': 'Soup', 'img': 'assets/soup.jpeg'},
-    {'name': 'Juice', 'img': 'assets/juice.jpeg'},
+    {'name': 'Pizza', 'img': 'assets/pizza.jpg'},
+    {'name': 'Indian', 'img': 'assets/indian.jpg'},
+    {'name': 'Burger', 'img': 'assets/burger.jpg'},
+    {'name': 'Kottu', 'img': 'assets/koththu.jpg'},
+    {'name': 'Soup', 'img': 'assets/soup.jpg'},
+    {'name': 'Juice', 'img': 'assets/juice.jpg'},
   ];
 
   @override
@@ -31,14 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        // Hide default back button, use custom menu icon if needed
         automaticallyImplyLeading: false,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          // children: [
-          //   //Text("Home page", style: GoogleFonts.poppins(color: Colors.grey[400], fontSize: 14)),
-          // ],
-        ),
         actions: [
           if (widget.userRole == 'admin')
             IconButton(
@@ -54,14 +49,11 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 10),
-            // 1. GREY BANNER "Hi Name"
+            // Grey Banner
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.grey[300], // Light grey background like image
-                borderRadius: BorderRadius.circular(0), // Sharp edges as per image
-              ),
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(color: Colors.grey[300]),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -72,44 +64,49 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 2. "Menu" Title
             Text("Menu", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 15),
 
-            // 3. GRID VIEW (2 Columns)
+            // Grid Layout
             Expanded(
               child: GridView.builder(
                 itemCount: categories.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // Two items per row
+                  crossAxisCount: 2,
                   crossAxisSpacing: 15,
                   mainAxisSpacing: 15,
-                  childAspectRatio: 0.8, // Taller items
+                  childAspectRatio: 0.8,
                 ),
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(
-                          builder: (_) => CategoryDetailsScreen(categoryName: categories[index]['name']!)
+                          builder: (_) => CategoryDetailsScreen(
+                            categoryName: categories[index]['name']!,
+                            userRole: widget.userRole,
+                          )
                       ));
                     },
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
                         border: Border.all(color: Colors.grey.shade400),
-                        borderRadius: BorderRadius.circular(5),
+                        borderRadius: BorderRadius.circular(2),
                       ),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Image.asset(categories[index]['img']!, fit: BoxFit.cover),
+                              child: Image.asset(
+                                categories[index]['img']!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (c, o, s) => const Icon(Icons.broken_image, color: Colors.grey),
+                              ),
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.only(bottom: 10.0),
                             child: Text(categories[index]['name']!, style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
                           ),
                         ],

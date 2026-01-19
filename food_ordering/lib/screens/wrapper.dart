@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'home/home_screen.dart';
-import 'cart_screen.dart';
-import 'profile_screen.dart';
+// --- THESE IMPORTS ARE CRITICAL ---
+import 'home/home_screen.dart';    // Tells wrapper where HomeScreen is
+import 'cart_screen.dart';         // Tells wrapper where CartScreen is
+import 'profile_screen.dart';      // Tells wrapper where ProfileScreen is
+// ----------------------------------
 
 class MainWrapper extends StatefulWidget {
   final String userRole; // 'admin' or 'user'
@@ -28,10 +30,10 @@ class _MainWrapperState extends State<MainWrapper> {
   void initState() {
     super.initState();
 
-    // 1. Setup Pages for USERS (Home, Cart, Profile)
+    // 1. Setup Pages for USERS
     _userPages = [
       HomeScreen(
-        userName: widget.userName, // Passing the name here fixes your error!
+        userName: widget.userName,
         userRole: 'user',
       ),
       const CartScreen(),
@@ -44,7 +46,7 @@ class _MainWrapperState extends State<MainWrapper> {
       ),
     ];
 
-    // 2. Setup Pages for ADMINS (Home, Profile - No Cart)
+    // 2. Setup Pages for ADMINS
     _adminPages = [
       HomeScreen(
         userName: "Admin",
@@ -74,7 +76,7 @@ class _MainWrapperState extends State<MainWrapper> {
         unselectedItemColor: Colors.grey,
         showSelectedLabels: true,
         showUnselectedLabels: true,
-        type: BottomNavigationBarType.fixed, // Keeps buttons stable
+        type: BottomNavigationBarType.fixed,
         items: isUser
             ? const [
           BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),

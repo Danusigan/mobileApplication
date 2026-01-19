@@ -15,8 +15,7 @@ class OrdersScreen extends StatelessWidget {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('orders')
-            .where('userId', isEqualTo: userId) // Filter by logged-in user
-            .orderBy('date', descending: true)
+            .where('userId', isEqualTo: userId) // Only Filter (No OrderBy here to avoid Index error)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -26,7 +25,16 @@ class OrdersScreen extends StatelessWidget {
             return const Center(child: Text("No orders found."));
           }
 
-          final orders = snapshot.data!.docs;
+          // 1. GET THE DATA
+          var orders = snapshot.data!.docs.toList();
+
+          // 2. SORT LOCALLY (Fixes the "Disappearing" bug)
+          // We sort by 'date' string in descending order (Newest first)
+          orders.sort((a, b) {
+            String dateA = a['date'];
+            String dateB = b['date'];
+            return dateB.compareTo(dateA);
+          });
 
           return ListView.builder(
             padding: const EdgeInsets.all(10),
@@ -37,31 +45,57 @@ class OrdersScreen extends StatelessWidget {
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 15),
+                elevation: 3,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Header: Order ID and Status
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Order #${order.id.substring(0, 6)}", style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+                          Text(
+                              "Order #${order.id.substring(0, 6).toUpperCase()}",
+                              style: GoogleFonts.poppins(fontWeight: FontWeight.bold)
+                          ),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                             decoration: BoxDecoration(
                               color: Colors.orange.shade100,
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Text(order['status'], style: TextStyle(color: Colors.orange.shade800, fontSize: 12)),
+                            child: Text(
+                                order['status'],
+                                style: TextStyle(color: Colors.orange.shade800, fontSize: 12, fontWeight: FontWeight.bold)
+                            ),
                           ),
                         ],
                       ),
                       const Divider(),
-                      ...items.map((item) => Text("${item['quantity']}x ${item['name']} (LKR ${item['price']})")).toList(),
+
+                      // List of Items in this order
+                      ...items.map((item) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("${item['quantity']} x ${item['name']}", style: const TextStyle(fontSize: 14)),
+                            Text("LKR ${item['price']}", style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                          ],
+                        ),
+                      )),
+
                       const Divider(),
+
+                      // Total Amount
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Text("Total: LKR ${order['amount']}", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                        child: Text(
+                            "Total: LKR ${order['amount']}",
+                            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 16)
+                        ),
                       ),
                     ],
                   ),
